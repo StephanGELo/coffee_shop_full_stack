@@ -66,6 +66,7 @@ def retrieve_drinks_detail(token):
     except Exception:
         abort(404)
 
+
 '''
 @TODO implement endpoint
     POST /drinks
@@ -78,20 +79,19 @@ def retrieve_drinks_detail(token):
 '''
 @app.route('/drinks', methods=['POST'])
 @requires_auth('post:drinks')
-
 def add_drinks(token):
     data = request.get_json()
-    
+
     try:
         recipe = data['recipe']
         if isinstance(recipe, dict):
             recipe = [recipe]
-        
+
         drink = Drink()
         drink.title = data['title']
         drink.recipe = json.dumps(recipe)
         drink.insert()
-        
+
         return jsonify({
             "success": True,
             "drinks": [drink.long()]
@@ -195,6 +195,7 @@ Example error handling for unprocessable entity
     error handler should conform to general task above
 '''
 
+
 @app.errorhandler(400)
 def bad_request(error):
     return jsonify({
@@ -203,13 +204,15 @@ def bad_request(error):
         "message": "Bad Request"
     }), 400
 
+
 @app.errorhandler(401)
 def unauthorized(error):
-     return jsonify({
-         "success": False,
-         "error": 401,
-         "message": 'Unathorized'
-     }), 401
+    return jsonify({
+        "success": False,
+        "error": 401,
+        "message": 'Unathorized'
+    }), 401
+
 
 @app.errorhandler(404)
 def not_found(error):
@@ -219,6 +222,7 @@ def not_found(error):
         "message": "Resource Not Found"
     }), 404
 
+
 @app.errorhandler(405)
 def not_allowed(error):
     return jsonify({
@@ -226,6 +230,7 @@ def not_allowed(error):
         "error": 405,
         "message": "Method Not Allowed"
     }), 405
+
 
 @app.errorhandler(422)
 def unprocessable(error):
@@ -235,6 +240,7 @@ def unprocessable(error):
         "message": "Unprocessable"
     }), 422
 
+
 @app.errorhandler(500)
 def internal_server_error(error):
     return jsonify({
@@ -242,6 +248,7 @@ def internal_server_error(error):
         "error": 500,
         "message": "Internal Server Error"
     }), 500
+
 
 '''
 @TODO implement error handler for AuthError
