@@ -33,14 +33,14 @@ class AuthError(Exception):
     return the token part of the header
 '''
 def get_token_auth_header():
-    authorization_header = request.headers['Authorization']
-    if 'Authorization' not in authorization_header:
+    authorization_header = request.headers.get('Authorization', None)
+    if not authorization_header:
         raise AuthError ({
             'code': 'missing_header',
             'description': 'The header is expected.'
         }, 401)
     
-    header_parts = authorization_header.split()
+    header_parts = authorization_header.split(' ')
     if header_parts[0].lower() != 'bearer':
         raise AuthError ({
             'code': 'invalid_header',
@@ -61,8 +61,6 @@ def get_token_auth_header():
     
     token = header_parts[1]
     return token
-
-    # raise Exception('Not Implemented')
 
 '''
 @TODO implement check_permissions(permission, payload) method
@@ -159,7 +157,7 @@ def verify_decode_jwt(token):
     raise AuthError({
         'code': 'invalid_header',
         'description': 'Unable to find the appropriate key'
-    }, 400)
+    }, 401)
 
 '''
 @TODO implement @requires_auth(permission) decorator method
@@ -178,11 +176,9 @@ def requires_auth(permission=''):
             token = get_token_auth_header()
             try:
                 payload = verify_decode_jwt(token)
-            except:
+            except Exception:
                 abort(401)
-
             check_permissions(permission, payload)
-
             return f(payload, *args, **kwargs)
 
         return wrapper
